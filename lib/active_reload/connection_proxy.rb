@@ -19,6 +19,7 @@ module ActiveReload
     
     def self.setup_for(master, slave = nil)
       slave ||= ActiveRecord::Base
+      slave.send :include, ActiveRecordConnectionMethods
       ActiveRecord::Base.active_connections[slave.name] = new(master, slave)
     end
 
@@ -49,16 +50,14 @@ module ActiveReload
       @current.send(method, *args, &block)
     end
   end
-end
-
-class << ActiveRecord::Base
-  def inherited_with_master(base)
-    base.class_eval do
-      def reload(*args, &block)
-        connection.with_master { super }
-      end
+  
+  module ActiveRecordConnectionMethods
+    def self.included(base)
+      base.alias_method_chain :reload, :master
+    end
+    
+    def reload_with_master(*args, &block)
+      connection.with_master { reload_without_master }
     end
   end
-  
-  alias_method_chain :inherited, :master
 end

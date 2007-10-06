@@ -5,13 +5,22 @@ module ActiveReload
   end
 
   class ConnectionProxy
-    def initialize
-      @slave   = ActiveRecord::Base.connection
-      @master  = ActiveReload::MasterDatabase.connection
+    def initialize(master, slave)
+      @slave   = slave.connection
+      @master  = master.connection
       @current = @slave
     end
     
     attr_accessor :slave, :master
+
+    def self.setup!
+      setup_for ActiveReload::MasterDatabase
+    end
+    
+    def self.setup_for(master, slave = nil)
+      slave ||= ActiveRecord::Base
+      ActiveRecord::Base.active_connections[slave.name] = new(master, slave)
+    end
 
     def with_master
       set_to_master!

@@ -1,0 +1,28 @@
+masochism
+==============
+
+Connection proxy sends some queries (thoes in a transaction, update statements,
+and ActiveRecord::Base#reload) to a master database, and the rest to the slave
+database.  The ActiveReload::MasterDatabase model uses a 'master_database'
+setting in database.yml to serve as the master database.  
+
+To setup:
+
+Whether you want this in production only, or maybe just your deployment server, 
+is up to you.  Just call this method somewhere:
+
+  ActiveReload::ConnectionProxy.setup!
+
+Some suggestions:
+
+  * in a config/initializer
+  * config.after_initialize block
+
+If you want a model to always use the Master database, you can inherit 
+ActiveRelaod::MasterDatabase.  Any models with their own database connection
+will not be affected.
+
+Setting up your own proxies:
+
+  # Sets up MyMaster's connection as the master database connection for User.
+  ActiveReload::ConnectionProxy.setup_for MyMaster, User

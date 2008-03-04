@@ -26,7 +26,7 @@ database.yml to serve as the master database.
 To setup:
 
 Whether you want this in production only, or maybe just your deployment server, 
-is up to you.  
+is up to you. Just call the following method in your desired environment file.
 
   ActiveReload::ConnectionProxy.setup!
 
@@ -43,3 +43,4 @@ Setting up your own proxies:
 
   # Sets up MyMaster's connection as the master database connection for User.
   ActiveReload::ConnectionProxy.setup_for MyMaster, User
+  

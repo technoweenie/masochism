@@ -1,7 +1,7 @@
 masochism
 ==============
 
-Connection proxy sends some queries (thoes in a transaction, update statements,
+Connection proxy sends some queries (those in a transaction, update statements,
 and ActiveRecord::Base#reload) to a master database, and the rest to the slave
 database.  The ActiveReload::MasterDatabase model uses a 'master_database'
 setting in database.yml to serve as the master database.  

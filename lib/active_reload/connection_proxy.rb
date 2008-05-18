@@ -20,9 +20,6 @@ module ActiveReload
     def self.setup_for(master, slave = nil)
       slave ||= ActiveRecord::Base
       slave.send :include, ActiveRecordConnectionMethods
-      # extend observer to always use the master database
-      # observers only get triggered on writes, so shouldn't be a performance hit
-      # removes a race condition if you are using conditionals in the observer
       ActiveRecord::Observer.send :include, ActiveReload::ObserverExtensions
       ActiveRecord::Base.active_connections[slave.name] = new(master, slave)
     end
@@ -44,7 +41,7 @@ module ActiveReload
     
     delegate :insert, :update, :delete, :create_table, :rename_table, :drop_table, :add_column, :remove_column, 
       :change_column, :change_column_default, :rename_column, :add_index, :remove_index, :initialize_schema_information,
-      :dump_schema_information, :to => :master
+      :dump_schema_information, :execute, :to => :master
     
     def transaction(start_db_transaction = true, &block)
       with_master { @current.transaction(start_db_transaction, &block) }
@@ -64,7 +61,10 @@ module ActiveReload
       connection.with_master { reload_without_master }
     end
   end
-  
+
+  # extend observer to always use the master database
+  # observers only get triggered on writes, so shouldn't be a performance hit
+  # removes a race condition if you are using conditionals in the observer
   module ObserverExtensions
     def self.included(base)
       base.alias_method_chain :update, :masterdb

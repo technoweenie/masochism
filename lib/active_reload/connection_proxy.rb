@@ -1,7 +1,7 @@
 module ActiveReload
   class MasterDatabase < ActiveRecord::Base
     self.abstract_class = true
-    establish_connection :master_database
+    establish_connection configurations[Rails.env]['master_database'] || :master_database
   end
 
   class ConnectionProxy

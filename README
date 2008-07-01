@@ -1,13 +1,14 @@
 masochism
-==============
+=========
 
 The masochism plugin provides an easy solution for Ruby on Rails applications to
 work in a replicated database environment. Connection proxy sends some database
 queries (those in a transaction, update statements, and ActiveRecord::Base#reload) 
 to a master database, and the rest to the slave database. 
 
-The ActiveReload::MasterDatabase model uses a 'master_database' setting in 
-database.yml to serve as the master database.
+The ActiveReload::MasterDatabase model uses a 'master_database' setting that
+can either be defined for all of your environments, or for each environment as
+a nested declaration:
 
   # config/database.yml
   login: &login
@@ -16,11 +17,24 @@ database.yml to serve as the master database.
     port: 5432
 
   production:
-    database: slave_database_name
+    database: production_slave_database_name
     <<: *login
-    
+
   master_database:
-    database: master_database_name
+    database: production_master_database_name
+    <<: *login
+
+  staging:
+    database: staging_database_name
+    host: slave-db-pool.local
+    <<: *login
+    master_database: 
+      database: staging_database_name
+      host: master-db-server.local
+      <<: *login
+
+  development: # Does not use masochism
+    database: development_database_name
     <<: *login
 
 To setup:

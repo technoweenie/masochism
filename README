@@ -35,6 +35,22 @@ Some suggestions:
   * in a config/initializer
   * config.after_initialize block
 
+If you are using the Litespeed web server, child processes are initialized on 
+creation, which means any setup done in an environment file will be effectively 
+ignored. A brief discussion of the problem is posted here:
+http://litespeedtech.com/support/wiki/doku.php?id=litespeed_wiki:rails:memcache
+
+One solution for Litespeed users is to check the connection at your first request
+and do the setup! call if your connection hasn't been initialized, like:
+
+class ApplicationController < ActionController::Base
+  prepend_before_filter do |controller|
+    ActiveReload::ConnectionProxy.setup! unless ActiveRecord::Base.connection.is_a? ActiveReload::ConnectionProxy
+  end
+  ...
+end
+
+
 If you want a model to always use the Master database, you can inherit 
 ActiveRelaod::MasterDatabase.  Any models with their own database connection
 will not be affected.

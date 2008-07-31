@@ -41,7 +41,7 @@ module ActiveReload
     
     delegate :insert, :update, :delete, :create_table, :rename_table, :drop_table, :add_column, :remove_column, 
       :change_column, :change_column_default, :rename_column, :add_index, :remove_index, :initialize_schema_information,
-      :dump_schema_information, :execute, :to => :master
+      :dump_schema_information, :execute, :columns, :to => :master
     
     def transaction(start_db_transaction = true, &block)
       with_master { @current.transaction(start_db_transaction, &block) }

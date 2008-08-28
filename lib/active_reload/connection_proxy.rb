@@ -58,7 +58,11 @@ module ActiveReload
     end
     
     def reload_with_master(*args, &block)
-      connection.with_master { reload_without_master }
+      if connection.class.name == "ActiveReload::ConnectionProxy"
+        connection.with_master { reload_without_master }
+      else
+        reload_without_master
+      end
     end
   end
 

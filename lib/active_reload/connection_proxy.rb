@@ -32,10 +32,16 @@ module ActiveReload
     end
 
     def set_to_master!
+      return if @current == @master
+      
+      logger.info "Switching to Master"
       @current = @master
     end
     
     def set_to_slave!
+      return if @current == @master
+      
+      logger.info "Switching to Slave"
       @current = @slave
     end
     

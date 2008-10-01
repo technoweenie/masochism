@@ -78,7 +78,7 @@ Using the MasterFilter class is quite simple. If you have any actions you know r
 the Master DB for both reads and writes simply do the following:
 
 class RandomController < ApplicationController
-  around_filter MasterFilter, :only => [:show, :edit, :update]
+  around_filter ActiveReload::MasterFilter, :only => [:show, :edit, :update]
   
   ...
 end

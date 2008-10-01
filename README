@@ -74,3 +74,11 @@ Setting up your own proxies:
   # Sets up MyMaster's connection as the master database connection for User.
   ActiveReload::ConnectionProxy.setup_for MyMaster, User
   
+Using the MasterFilter class is quite simple. If you have any actions you know require 
+the Master DB for both reads and writes simply do the following:
+
+class RandomController < ApplicationController
+  around_filter MasterFilter, :only => [:show, :edit, :update]
+  
+  ...
+end

@@ -51,11 +51,11 @@ module ActiveReload
       slave.connection_proxy = new(master, slave)
     end
 
-    def with_master
+    def with_master(to_slave = true)
       set_to_master!
       yield
     ensure
-      set_to_slave!
+      set_to_slave! if to_slave
     end
 
     def set_to_master!
@@ -77,7 +77,9 @@ module ActiveReload
       :dump_schema_information, :execute, :to => :master
 
     def transaction(start_db_transaction = true, &block)
-      with_master { master.transaction(start_db_transaction, &block) }
+      with_master(start_db_transaction) do
+        master.transaction(start_db_transaction, &block)
+      end
     end
 
     def method_missing(method, *args, &block)

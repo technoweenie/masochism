@@ -8,7 +8,12 @@ to a master database, and the rest to the slave database.
 
 The ActiveReload::MasterDatabase model uses a 'master_database' setting that
 can either be defined for all of your environments, or for each environment as
-a nested declaration:
+a nested declaration.
+
+The ActiveReload::SlaveDatabase model uses a 'slave_database' setting that
+can only be defined per environment.
+
+Example declarations:
 
   # config/database.yml
   login: &login
@@ -31,6 +36,15 @@ a nested declaration:
     master_database: 
       database: staging_database_name
       host: master-db-server.local
+      <<: *login
+
+  qa:
+    database: qa_master_database_name
+    host: qa-master
+    <<: *login
+    slave_database:
+      database: qa_slave_database_name
+      host: qa-slave
       <<: *login
 
   development: # Does not use masochism

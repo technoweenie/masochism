@@ -13,14 +13,25 @@ module ActiveReload
   end
 
   class ConnectionProxy
-    def initialize(master, slave)
-      @slave   = slave.connection
-      @master  = master.connection
-      @current = @slave
+    
+    def initialize(master_class, slave_class)
+      @master  = master_class
+      @slave   = slave_class
+      @current = :slave
     end
-
-    attr_accessor :slave, :master
-
+    
+    def master
+      @slave.connection_handler.retrieve_connection(@master)
+    end
+    
+    def slave
+      @slave.retrieve_connection
+    end
+    
+    def current
+      send @current
+    end
+    
     def self.setup!
       if slave_defined?
         setup_for ActiveReload::MasterDatabase, ActiveReload::SlaveDatabase
@@ -37,7 +48,7 @@ module ActiveReload
       slave ||= ActiveRecord::Base
       slave.send :include, ActiveRecordConnectionMethods
       ActiveRecord::Observer.send :include, ActiveReload::ObserverExtensions
-      ActiveRecord::Base.active_connections[slave.name] = new(master, slave)
+      slave.connection_proxy = new(master, slave)
     end
 
     def with_master
@@ -48,17 +59,17 @@ module ActiveReload
     end
 
     def set_to_master!
-      return if @current == @master
-
-      logger.info "Switching to Master"
-      @current = @master
+      unless @current == :master
+        @slave.logger.info "Switching to Master"
+        @current = :master
+      end
     end
 
     def set_to_slave!
-      return if @current == @slave
-
-      logger.info "Switching to Slave"
-      @current = @slave
+      unless @current == :slave
+        @master.logger.info "Switching to Slave"
+        @current = :slave
+      end
     end
 
     delegate :insert, :update, :delete, :create_table, :rename_table, :drop_table, :add_column, :remove_column,
@@ -66,17 +77,28 @@ module ActiveReload
       :dump_schema_information, :execute, :to => :master
 
     def transaction(start_db_transaction = true, &block)
-      with_master { @current.transaction(start_db_transaction, &block) }
+      with_master { master.transaction(start_db_transaction, &block) }
     end
 
     def method_missing(method, *args, &block)
-      @current.send(method, *args, &block)
+      current.send(method, *args, &block)
     end
   end
 
   module ActiveRecordConnectionMethods
     def self.included(base)
       base.alias_method_chain :reload, :master
+      
+      class << base
+        def connection_proxy=(proxy)
+          @@connection_proxy = proxy
+        end
+        
+        # hijack the original method
+        def connection
+          @@connection_proxy
+        end
+      end
     end
 
     def reload_with_master(*args, &block)

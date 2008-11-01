@@ -1,6 +1,11 @@
 masochism
 =========
 
+<div style="width:240px; padding:2px; border:1px solid silver; float:right; margin:0 0 1em 2em; background:white">
+  <img src="http://farm1.static.flickr.com/111/295426387_a39c5c8954_m.jpg" alt="Scream" />
+  <p style="text-align:center">photo by <a href="http://flickr.com/people/alphadesigner/" title="Flickr: ArtWerk">ArtWerk</a></p>
+</div>
+
 The masochism plugin provides an easy solution for Ruby on Rails applications to work in a
 replicated database environment. It works by replacing the `connection` object accessed by
 ActiveRecord models by ConnectionProxy that chooses between master and slave when

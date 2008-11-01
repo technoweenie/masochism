@@ -43,6 +43,23 @@ Example usage:
 Considerations
 --------------
 
+### Thinking Sphinx
+
+Thinking Sphinx inspects the `connection` object to determine the database adapter.
+Because masochism works by putting the connection proxy in its place, TS will be confused
+about `ActiveReload::ConnectionProxy` and abort. A possible workaround is to monkeypatch TS right to **hardcode** our adapter after masochism has been enabled:
+
+    # ConnectionProxy from masochism confuses TS
+    ThinkingSphinx::Index.class_eval do
+      def adapter() :mysql end
+    end
+
+    ThinkingSphinx::AbstractAdapter.class_eval do
+      def self.detect(model)
+        ThinkingSphinx::MysqlAdapter
+      end
+    end
+
 ### Litespeed web server
 
 If you are using the Litespeed web server, child processes are initialized on creation,

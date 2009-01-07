@@ -65,13 +65,13 @@ about `ActiveReload::ConnectionProxy` and abort. A possible workaround is to mon
       end
     end
 
-### Litespeed web server
+### Litespeed web server or Phusion Passenger (mod_rails)
 
-If you are using the Litespeed web server, child processes are initialized on creation,
+If you are using the Litespeed web server or Passenger (mod_rails), child processes are initialized on creation,
 which means any setup done in an environment file will be effectively ignored. [A brief
 discussion of the problem is posted here](http://litespeedtech.com/support/wiki/doku.php?id=litespeed_wiki:rails:memcache).
 
-One solution for Litespeed users is to check the connection at your first request and do
+One solution for Litespeed/Passenger users is to check the connection at your first request and do
 the `setup!` call if your connection hasn't been initialized, like:
 
     # in ApplicationController

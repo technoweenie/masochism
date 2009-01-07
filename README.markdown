@@ -65,9 +65,9 @@ about `ActiveReload::ConnectionProxy` and abort. A possible workaround is to mon
       end
     end
 
-### Litespeed web server or Phusion Passenger (mod_rails)
+### Litespeed web server or Phusion Passenger (mod\_rails)
 
-If you are using the Litespeed web server or Passenger (mod_rails), child processes are initialized on creation,
+If you are using the Litespeed web server or Passenger (mod\_rails), child processes are initialized on creation,
 which means any setup done in an environment file will be effectively ignored. [A brief
 discussion of the problem is posted here](http://litespeedtech.com/support/wiki/doku.php?id=litespeed_wiki:rails:memcache).
 
@@ -85,10 +85,10 @@ the `setup!` call if your connection hasn't been initialized, like:
 Advanced
 --------
 
-The ActiveReload::MasterDatabase model uses a 'master_database' setting that can either be
+The ActiveReload::MasterDatabase model uses a 'master\_database' setting that can either be
 defined for all of your environments, or for each environment as a nested declaration.
 
-The ActiveReload::SlaveDatabase model uses a 'slave_database' setting that can only be
+The ActiveReload::SlaveDatabase model uses a 'slave\_database' setting that can only be
 defined per environment.
 
 Example:
